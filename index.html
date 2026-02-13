@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Val? 💝</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .container {
+        text-align: center;
+        position: relative;
+        z-index: 10;
+    }
+
+    .question-screen {
+        background: white;
+        padding: 60px 40px;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    h1 {
+        font-size: 3em;
+        color: #e91e63;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .heart {
+        font-size: 4em;
+        animation: heartbeat 1.5s infinite;
+        display: inline-block;
+    }
+
+    @keyframes heartbeat {
+        0%, 100% { transform: scale(1); }
+        25% { transform: scale(1.1); }
+    }
+
+    .message {
+        font-size: 1.3em;
+        color: #333;
+        margin: 30px 0;
+        font-weight: 500;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 40px;
+    }
+
+    button {
+        padding: 15px 40px;
+        font-size: 1.2em;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .yes-btn {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .yes-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+    }
+
+    .no-btn {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        color: #333;
+    }
+
+    .no-btn:hover {
+        transform: scale(1.05);
+    }
+
+    .wrong-message {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2em;
+        color: #ff4757;
+        font-weight: bold;
+        background: white;
+        padding: 30px 50px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        animation: wrongShake 0.5s ease;
+    }
+
+    @keyframes wrongShake {
+        0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+        25% { transform: translate(-50%, -50%) rotate(-5deg); }
+        75% { transform: translate(-50%, -50%) rotate(5deg); }
+    }
+
+    .celebration-screen {
+        display: none;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    .curtain-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 100;
+        display: none;
+    }
+    
+    .curtain-container.active {
+        display: block;
+    }
+
+    .curtain {
+        position: absolute;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(90deg, #c92a60 0%, #e91e63 100%);
+        transition: transform 2s ease-in-out;
+    }
+
+    .curtain-left {
+        left: 0;
+        transform: translateX(0);
+    }
+
+    .curtain-right {
+        right: 0;
+        transform: translateX(0);
+    }
+
+    .curtain.open.curtain-left {
+        transform: translateX(-100%);
+    }
+
+    .curtain.open.curtain-right {
+        transform: translateX(100%);
+    }
+
+    .firework-trail {
+        position: fixed;
+        width: 6px;
+        height: 60px;
+        background: linear-gradient(to top, transparent, #fff, #ffff00);
+        border-radius: 50%;
+        animation: shoot-up 1s ease-out forwards;
+        box-shadow: 0 0 20px #ffff00;
+    }
+
+    @keyframes shoot-up {
+        0% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-600px);
+            opacity: 0;
+        }
+    }
+
+    .firework-particle {
+        position: fixed;
+        width: 4px;
+        height: 30px;
+        background: linear-gradient(to bottom, transparent, currentColor);
+        border-radius: 50%;
+        opacity: 0;
+    }
+
+    @keyframes explode {
+        0% {
+            transform: translate(0, 0) scale(1);
+            opacity: 1;
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            transform: translate(var(--tx), var(--ty)) scale(1);
+            opacity: 0;
+        }
+    }
+    
+    .balloon {
+        position: fixed;
+        font-size: 3em;
+        animation: balloon-fall 4s ease-in;
+        pointer-events: none;
+    }
+
+    @keyframes balloon-fall {
+        0% {
+            transform: translateY(-100px) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0.8;
+        }
+    }
+
+    .form-container {
+        background: white;
+        padding: 40px;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .form-container h2 {
+        color: #e91e63;
+        margin-bottom: 10px;
+        font-size: 2em;
+    }
+
+    .form-container p {
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1em;
+        font-family: inherit;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #e91e63;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.2em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .success-message {
+        background: white;
+        padding: 40px;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .success-message h2 {
+        color: #4caf50;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+    }
+
+    .success-message p {
+        color: #666;
+        font-size: 1.2em;
+    }
+
+    .emoji-rain {
+        position: fixed;
+        font-size: 2em;
+        animation: emoji-fall 4s linear;
+        pointer-events: none;
+    }
+
+    @keyframes emoji-fall {
+        to {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+        }
+    }
+</style>
+
+
+</head>
+<body>
+    <div class="container">
+        <!-- Question Screen -->
+        <div id="questionScreen" class="question-screen">
+            <div class="heart">💝</div>
+            <h1>Hi VAnEsSa 🥹</h1>
+            <p class="message">Will you be my Val?</p>
+            <div class="buttons">
+                <button class="yes-btn" onclick="handleYes()">Yes! 💕</button>
+                <button class="no-btn" onclick="handleNo()">No</button>
+            </div>
+        </div>
+
+
+    <!-- Celebration Screen -->
+    <div id="celebrationScreen" class="celebration-screen">
+        <div class="form-container">
+            <h2>Yaaay! 🎉</h2>
+            <p>Tell me what would make this Valentine's special for you!</p>
+            <form id="valentineForm" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="gifts">What do you want for Valentine's? 🎁</label>
+                    <textarea id="gifts" name="gifts" placeholder="Make a Wish..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="location">Where do you want to spend Valentine's? 📍</label>
+                    <input type="text" id="location" name="location" placeholder="Any special place?" required>
+                </div>
+                <small style="color: green;">i'm sorry that we can't travel on 14 because of this event,<br> pick a day after 15th 🙏</small>
+                <button type="submit" class="submit-btn">Send My Wishes 💌</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="successScreen" class="celebration-screen hidden">
+        <div class="success-message">
+            <h2>💖 Perfect! 💖</h2>
+            <p>Your wishes have been sent! Get ready for an amazing Valentine's Day! 🌹</p>
+        </div>
+    </div>
+</div>
+
+<!-- Curtains -->
+<div class="curtain-container" id="curtainContainer">
+    <div class="curtain curtain-left"></div>
+    <div class="curtain curtain-right"></div>
+</div>
+
+<script>
+    const wrongMessages = [
+        "Omor 😤",
+        "Wrong answer! 🙅‍♀️",
+        "Choose another answer! 💁‍♀️",
+        "Why na? 😭",
+        "Try again! 🤔",
+        "Nope! Pick Yes! 💕"
+    ];
+
+    function handleNo() {
+        const randomMessage = wrongMessages[Math.floor(Math.random() * wrongMessages.length)];
+        
+        // Create and show wrong message
+        const wrongDiv = document.createElement('div');
+        wrongDiv.className = 'wrong-message';
+        wrongDiv.textContent = randomMessage;
+        document.body.appendChild(wrongDiv);
+        
+        // Remove message after 1 second
+        setTimeout(() => {
+            wrongDiv.remove();
+        }, 1000);
+    }
+
+    function handleYes() {
+        // Hide question screen immediately
+        document.getElementById('questionScreen').style.display = 'none';
+        
+        // Show curtains
+        document.getElementById('curtainContainer').classList.add('active');
+        
+        // Create fireworks
+        createFireworks();
+        
+        // Create balloons
+        createBalloons();
+        
+        // Open curtains after a brief moment
+        setTimeout(() => {
+            const curtains = document.querySelectorAll('.curtain');
+            curtains.forEach(curtain => curtain.classList.add('open'));
+        }, 500);
+        
+        // Show celebration screen after curtains open
+        setTimeout(() => {
+            document.getElementById('celebrationScreen').style.display = 'block';
+            document.getElementById('curtainContainer').style.display = 'none';
+        }, 2500);
+    }
+
+    function createFireworks() {
+        const colors = ['#ff0000', '#ff6b00', '#ffff00', '#00ff00', '#0000ff', '#ff00ff', '#00ffff', '#ff1493', '#ffd700', '#ff69b4'];
+        
+        for (let i = 0; i < 12; i++) {
+            setTimeout(() => {
+                const x = 100 + Math.random() * (window.innerWidth - 200);
+                const y = window.innerHeight - 50;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Create shooting trail
+                const trail = document.createElement('div');
+                trail.className = 'firework-trail';
+                trail.style.left = x + 'px';
+                trail.style.top = y + 'px';
+                document.body.appendChild(trail);
+                
+                // After trail reaches peak, create explosion
+                setTimeout(() => {
+                    trail.remove();
+                    
+                    // Create explosion at peak
+                    const explosionY = y - 600;
+                    
+                    for (let j = 0; j < 60; j++) {
+                        const particle = document.createElement('div');
+                        particle.className = 'firework-particle';
+                        particle.style.left = x + 'px';
+                        particle.style.top = explosionY + 'px';
+                        particle.style.color = color;
+                        particle.style.filter = `hue-rotate(${Math.random() * 60 - 30}deg)`;
+                        
+                        const angle = (Math.PI * 2 * j) / 60;
+                        const velocity = 150 + Math.random() * 200;
+                        particle.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
+                        particle.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+                        
+                        particle.style.animation = `explode 1.5s ease-out forwards`;
+                        particle.style.animationDelay = Math.random() * 0.1 + 's';
+                        
+                        document.body.appendChild(particle);
+                        
+                        setTimeout(() => particle.remove(), 2000);
+                    }
+                }, 1000);
+                
+            }, i * 300);
+        }
+    }
+
+    function createBalloons() {
+        const balloonEmojis = ['🎈', '🎈', '🎈', '🎈', '🎈', '🎈'];
+        const balloonColors = ['red', 'blue', 'green', 'yellow', 'pink', 'purple'];
+        
+        for (let i = 0; i < 25; i++) {
+            setTimeout(() => {
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                balloon.textContent = balloonEmojis[Math.floor(Math.random() * balloonEmojis.length)];
+                balloon.style.left = Math.random() * 100 + '%';
+                balloon.style.animationDelay = Math.random() * 1 + 's';
+                balloon.style.animationDuration = (3 + Math.random() * 2) + 's';
+                document.body.appendChild(balloon);
+                
+                setTimeout(() => balloon.remove(), 5000);
+            }, i * 80);
+        }
+    }
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+        
+        const formData = new FormData(event.target);
+        const gifts = formData.get('gifts');
+        const location = formData.get('location');
+        
+        // Send email using FormSubmit
+        const form = document.getElementById('valentineForm');
+        const formAction = 'https://formsubmit.co/' + 'Mgbebuephraim@gmail.com';
+        
+        try {
+            const response = await fetch(formAction, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    gifts: gifts,
+                    location: location,
+                    _subject: "Valentine's Day Wishes! 💝",
+                    _template: "table"
+                })
+            });
+            
+            // Show success screen
+            document.getElementById('celebrationScreen').style.display = 'none';
+            document.getElementById('successScreen').classList.remove('hidden');
+            
+            // More celebration
+            createFireworks();
+            createBalloons();
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Something went wrong! But your wishes are saved: \n\nGifts: ' + gifts + '\n\nLocation: ' + location);
+        }
+    }
+</script>
+
+
+</body>
+</html>
